@@ -152,3 +152,141 @@ I learned many things over the course of this project, including but not limited
 * Chrome DevTools
 * DevOps 
 
+
+================================================================================================================================================================
+
+## C# Live Project with .NET Framework
+
+I participated in a two-week Live Project using the .NET Framework to create a Content Management Service app as part of my studies with the Tech Academy. I worked with a team of developers to create a web application for a Theatre Production Company based in Portland, Oregon. The goal of the project was to create an application that the theatre staff could use to display information about various aspects of their business, from rentals to blogs to upcoming productions. It was designed in such a way that the staff would be able to create, edit, delete and update information themselves without needing to implement any code. The changes could be made directly from the web application on their end through the Content Management Service (CMS). The application was created as an MVC application.
+
+My tasks during the project revolved around the “Productions” area of the site. Here are some highlights from my contributions to the project: 
+
+
+### Creating the Productions model:
+This project utilized code-first programming, so my first task was to create the “Productions” class that would contain all the relevant properties for the theatres’ upcoming productions. Once the class was created I applied migrations, updated the database, and added scaffolding to create the related views for the new class. The class properties were chosen to fit the needs of the theatre business in order to keep track of important aspects of their productions.
+
+```
+public class Productions
+    {
+        [Key]
+        public int ProductionId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Playwright { get; set; }
+        public int Runtime { get; set; }
+        public DateTime OpeningDay { get; set; }
+        public DateTime ClosingDay { get; set; }
+        public DateTime ShowTimeEve { get; set; }
+        public DateTime? ShowTimeMat { get; set; }
+        public int Season { get; set; }
+        public bool IsWorldPremiere { get; set; }
+        public string TicketLink { get; set; }
+        public bool IsCurrentlyShowing { get; set; }
+    }
+}
+```
+
+
+
+### Styling CRUD Pages:
+Next I added formatting and styling to the newly created pages related to CRUD functionality for the Productions. The theatre company had a particular color palette selected and these colors were defined as variables in the shared CSS project file. I used a combination of bootstrap and CSS to make the new CRUD pages styled appropriately so that the colors for the buttons, backgrounds, and input forms matched the rest of the application. 
+
+### Index Page Cards/buttons/modals:
+Using bootstrap I changed the index page so that the records in the database display as cards with an image/title at the top and the description at the bottom of each card. I used a “foreach” loop to iterate through all the database records and display each one on the page as seen in the below snippet. (Note that the image source is a placeholder, another developer is tasked with creating the related class for the Production photos and linking the respective id to the main Production class). 
+
+```
+<!--Card container-->
+<div class="container">
+  <div class="card-columns">
+    @foreach (var item in Model)
+    {
+      <!-- Display Cards -->
+    <div class="card">
+      <img src="http://www.fillmurray.com/g/200/300" alt="placeholder" class="card-img-top img-fluid" />
+      <div class="card-img-overlay">
+        @Html.ActionLink("Edit", "Edit", new { id = item.ProductionId }, new { @class = "badge badge-pill" })
+        @Html.ActionLink("Delete", "Delete", new { id = item.ProductionId }, new { @class = "badge badge-pill" })
+      </div>
+      <div class="card-body" style="transform: rotate(0);">
+        <h3 class="card-title"> @Html.DisplayFor(modelItem => item.Title)</h3>
+        <p class="card-text">@Html.DisplayFor(modelItem => item.Description)</p>
+        <a href="javascript:void(0);" class="anchorDetail stretched-link" data-id="@item.ProductionId"></a>
+      </div>
+    </div>
+ <!-- End Display Cards -->
+ <!-- Modal -->
+    <div id="myModal" class="modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div id="myModalContent"></div>
+        </div>
+      </div>
+    </div>
+ <!-- End Modal -->
+    }
+  </div>
+</div>
+<!-- End Card Container-->
+```
+
+I added buttons to each card that appear when the card is hovered. These buttons link to edit and delete pages for each record that allow the user to make edits to an existing record and save the changes, or delete the record entirely. 
+
+I also created a modal that gets triggered when the description at the bottom of each card is clicked. The content of the modal is dynamically populated based on which card is clicked. I added a function in the controller that would render a partial view in the modal for the respective card as seen below:
+
+```
+//Link to partial view for Index page details modal
+        public ActionResult IndexModal(int ProductionId)
+        {
+            Productions productions = db.Productions.Find(ProductionId);
+            return PartialView(@"~\Areas\Prod\Views\Productions\_Details.cshtml", productions);
+        }
+```
+
+I created a script using jQuery and ajax that would be triggered when the production description on the card was clicked. This would call the controller method and pass in the id and open the modal where the partial view displays. 
+
+```
+//Modal script 
+var ProductionDetailsURL = '/Productions/IndexModal';
+$(function () {
+    $(".anchorDetail").click(function () {
+        var $buttonClicked = $(this);
+        var id = $buttonClicked.attr('data-id')
+        var options = { "backdrop": "static", keyboard: true };
+        $.ajax({
+            type: "GET",
+            url: ProductionDetailsURL,
+            contentType: "application/json; charset=utf-8",
+            data: { "ProductionId": id },
+            datatype: "json",
+            success: function (data) {
+                $('#detailsModalContent').html(data);
+                $('#detailsModal').modal(options);
+                $('#detailsModal').modal('show');
+            },
+            error: function () {
+                alert("Something went wrong. Failed to load.");
+            }
+        });
+    });
+    $("#closebtn").click(function () {
+        $('#detailsModal').modal('hide');
+    });
+});
+```
+
+### Conclusion:
+These were just some of the major components of the application that I created. I utilized a combination of HTML, Razor, CSS, bootstrap, C#, and JavaScript to build this app.  
+
+I learned a lot while working on this application, some of the more notable things being:
+
+* Working with a team of developers
+* Utilizing resources to achieve desired results (online research, consulting with peers, asking for direction from project managers/instructors)
+* Importance of open and honest communication with team regarding successes and struggles
+* .NET Framework
+* JavaScript/jQuery
+* bootstrap 
+* Debugging and troubleshooting in C#
+* Chrome DevTools
+* DevOps (Azure)
+
+
